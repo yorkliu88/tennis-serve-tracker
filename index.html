@@ -54,6 +54,7 @@
         <button class="button" onclick="recordServe('long')">Long</button>
         <button class="button" onclick="recordServe('net')">Net</button>
         <button class="button" onclick="recordServe('let')">Let</button>
+        <button class="button" onclick="resetStats()">Reset</button>
     </div>
 
     <script>
@@ -69,6 +70,12 @@
             updateStats();
         }
 
+        function resetStats() {
+            totalServes = 0;
+            ballsIn = 0;
+            updateStats();
+        }
+
         function updateStats() {
             document.getElementById('total-serves').textContent = totalServes;
             document.getElementById('balls-in').textContent = ballsIn;
@@ -78,4 +85,3 @@
     </script>
 </body>
 </html>
-
