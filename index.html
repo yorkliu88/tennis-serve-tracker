@@ -56,6 +56,21 @@
         .reset-container {
             margin-top: 20px;
         }
+        .toggle-container {
+            margin-top: 20px;
+        }
+        .toggle-button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #ffc107;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .toggle-button.active {
+            background-color: #28a745;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -65,6 +80,7 @@
         <p>Balls In: <span id="balls-in">0</span></p>
         <p>Percentage In: <span id="percentage-in">0</span>%</p>
         <p>Percentage Out: <span id="percentage-out">0</span>%</p>
+        <p>Current Side: <span id="current-side">Deuce</span></p>
     </div>
     <div class="buttons">
         <button class="button in" onclick="recordServe('in')">IN</button>
@@ -82,6 +98,10 @@
         <button class="button reset" onclick="confirmReset()">Reset</button>
     </div>
 
+    <div class="toggle-container">
+        <button class="toggle-button" id="toggle-side" onclick="toggleSide()">Switch to Odd Side</button>
+    </div>
+
     <script>
         let totalServes = 0;
         let ballsIn = 0;
@@ -89,10 +109,11 @@
         let ballsWrongSide = 0;
         let ballsLong = 0;
         let ballsNet = 0;
+        let currentSide = 'deuce'; // Track whether it's the Deuce or Odd side
         const history = [];
 
         function recordServe(outcome) {
-            history.push({ totalServes, ballsIn, ballsWide, ballsWrongSide, ballsLong, ballsNet });
+            history.push({ totalServes, ballsIn, ballsWide, ballsWrongSide, ballsLong, ballsNet, currentSide });
 
             totalServes++;
             if (outcome === 'in') {
@@ -124,6 +145,7 @@
             ballsWrongSide = 0;
             ballsLong = 0;
             ballsNet = 0;
+            currentSide = 'deuce'; // Reset the side to Deuce
             updateStats();
         }
 
@@ -136,8 +158,17 @@
                 ballsWrongSide = lastState.ballsWrongSide;
                 ballsLong = lastState.ballsLong;
                 ballsNet = lastState.ballsNet;
+                currentSide = lastState.currentSide;
                 updateStats();
             }
+        }
+
+        function toggleSide() {
+            currentSide = (currentSide === 'deuce') ? 'odd' : 'deuce';
+            document.getElementById('current-side').textContent = currentSide.charAt(0).toUpperCase() + currentSide.slice(1);
+            const toggleButton = document.getElementById('toggle-side');
+            toggleButton.textContent = currentSide === 'deuce' ? 'Switch to Odd Side' : 'Switch to Deuce Side';
+            toggleButton.classList.toggle('active');
         }
 
         function updateStats() {
