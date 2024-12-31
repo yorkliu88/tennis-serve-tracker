@@ -24,6 +24,7 @@
             flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
+            margin-top: 20px;
         }
         .button {
             padding: 15px 25px;
@@ -46,6 +47,12 @@
         .button.in:hover {
             background-color: #1e7e34;
         }
+        .button.reset {
+            background-color: #6c757d;
+        }
+        .button.reset:hover {
+            background-color: #5a6268;
+        }
         .reset-container {
             margin-top: 20px;
         }
@@ -63,6 +70,8 @@
         <button class="button in" onclick="recordServe('in')">IN</button>
     </div>
 
+    <div style="height: 20px;"></div>
+
     <div class="buttons">
         <button class="button" onclick="recordServe('wide')">Wide</button>
         <button class="button" onclick="recordServe('wrong-side')">Wrong Side</button>
@@ -72,7 +81,7 @@
     </div>
 
     <div class="reset-container">
-        <button class="button" onclick="confirmReset()">Reset</button>
+        <button class="button reset" onclick="confirmReset()">Reset</button>
     </div>
 
     <script>
