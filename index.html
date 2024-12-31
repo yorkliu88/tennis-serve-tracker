@@ -38,6 +38,9 @@
         .button:hover {
             background-color: #0056b3;
         }
+        .reset-container {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -54,14 +57,21 @@
         <button class="button" onclick="recordServe('long')">Long</button>
         <button class="button" onclick="recordServe('net')">Net</button>
         <button class="button" onclick="recordServe('let')">Let</button>
-        <button class="button" onclick="resetStats()">Reset</button>
+        <button class="button" onclick="undoLastServe()">Undo</button>
+    </div>
+
+    <div class="reset-container">
+        <button class="button" onclick="confirmReset()">Reset</button>
     </div>
 
     <script>
         let totalServes = 0;
         let ballsIn = 0;
+        const history = [];
 
         function recordServe(outcome) {
+            history.push({ totalServes, ballsIn });
+
             totalServes++;
             if (outcome === 'in') {
                 ballsIn++;
@@ -70,10 +80,26 @@
             updateStats();
         }
 
+        function confirmReset() {
+            if (confirm('Are you sure?')) {
+                resetStats();
+            }
+        }
+
         function resetStats() {
+            history.length = 0; // Clear history
             totalServes = 0;
             ballsIn = 0;
             updateStats();
+        }
+
+        function undoLastServe() {
+            if (history.length > 0) {
+                const lastState = history.pop();
+                totalServes = lastState.totalServes;
+                ballsIn = lastState.ballsIn;
+                updateStats();
+            }
         }
 
         function updateStats() {
