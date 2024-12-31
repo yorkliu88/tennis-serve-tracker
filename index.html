@@ -38,6 +38,14 @@
         .button:hover {
             background-color: #0056b3;
         }
+        .button.in {
+            font-size: 1.5em;
+            padding: 20px 40px;
+            background-color: #28a745;
+        }
+        .button.in:hover {
+            background-color: #1e7e34;
+        }
         .reset-container {
             margin-top: 20px;
         }
@@ -52,7 +60,10 @@
         <p>Percentage Out: <span id="percentage-out">0</span>%</p>
     </div>
     <div class="buttons">
-        <button class="button" onclick="recordServe('in')">IN</button>
+        <button class="button in" onclick="recordServe('in')">IN</button>
+    </div>
+
+    <div class="buttons">
         <button class="button" onclick="recordServe('wide')">Wide</button>
         <button class="button" onclick="recordServe('wrong-side')">Wrong Side</button>
         <button class="button" onclick="recordServe('long')">Long</button>
