@@ -49,14 +49,14 @@
         <p>Total Serves: <span id="total-serves">0</span></p>
         <p>Balls In: <span id="balls-in">0</span></p>
         <p>Percentage In: <span id="percentage-in">0</span>%</p>
+        <p>Percentage Out: <span id="percentage-out">0</span>%</p>
     </div>
     <div class="buttons">
         <button class="button" onclick="recordServe('in')">IN</button>
         <button class="button" onclick="recordServe('wide')">Wide</button>
-        <button class="button" onclick="recordServe('middle')">Middle</button>
+        <button class="button" onclick="recordServe('wrong-side')">Wrong Side</button>
         <button class="button" onclick="recordServe('long')">Long</button>
         <button class="button" onclick="recordServe('net')">Net</button>
-        <button class="button" onclick="recordServe('let')">Let</button>
         <button class="button" onclick="undoLastServe()">Undo</button>
     </div>
 
@@ -67,14 +67,20 @@
     <script>
         let totalServes = 0;
         let ballsIn = 0;
+        let ballsWide = 0;
+        let ballsWrongSide = 0;
         const history = [];
 
         function recordServe(outcome) {
-            history.push({ totalServes, ballsIn });
+            history.push({ totalServes, ballsIn, ballsWide, ballsWrongSide });
 
             totalServes++;
             if (outcome === 'in') {
                 ballsIn++;
+            } else if (outcome === 'wide') {
+                ballsWide++;
+            } else if (outcome === 'wrong-side') {
+                ballsWrongSide++;
             }
 
             updateStats();
@@ -90,6 +96,8 @@
             history.length = 0; // Clear history
             totalServes = 0;
             ballsIn = 0;
+            ballsWide = 0;
+            ballsWrongSide = 0;
             updateStats();
         }
 
@@ -98,6 +106,8 @@
                 const lastState = history.pop();
                 totalServes = lastState.totalServes;
                 ballsIn = lastState.ballsIn;
+                ballsWide = lastState.ballsWide;
+                ballsWrongSide = lastState.ballsWrongSide;
                 updateStats();
             }
         }
@@ -106,7 +116,9 @@
             document.getElementById('total-serves').textContent = totalServes;
             document.getElementById('balls-in').textContent = ballsIn;
             const percentageIn = totalServes > 0 ? ((ballsIn / totalServes) * 100).toFixed(1) : 0;
+            const percentageOut = totalServes > 0 ? (((ballsWide + ballsWrongSide) / totalServes) * 100).toFixed(1) : 0;
             document.getElementById('percentage-in').textContent = percentageIn;
+            document.getElementById('percentage-out').textContent = percentageOut;
         }
     </script>
 </body>
