@@ -190,8 +190,13 @@
             elapsedTime = 0; // Reset timer
             clearInterval(timerInterval); // Stop the timer
             timerInterval = null; // Reset interval variable
+            
+            // Reset UI Elements
             updateStats();
             updateTimerDisplay();
+            document.getElementById('current-side').textContent = 'Deuce'; // Reset side label
+            document.getElementById('toggle-side').textContent = 'Switch to Odd Side'; // Reset toggle button text
+            document.getElementById('toggle-side').classList.remove('active'); // Reset toggle button state
         }
 
         function undoLastServe() {
