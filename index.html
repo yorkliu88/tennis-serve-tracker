@@ -106,9 +106,8 @@
         <button class="toggle-button" id="toggle-side" onclick="toggleSide()">Switch to Odd Side</button>
     </div>
 
-    <!-- Timer Display -->
     <div class="timer">
-        Time Elapsed: <span id="timer">0:00</span>
+        Time Elapsed: <span id="timer">0.0</span> seconds
     </div>
 
     <script>
@@ -121,9 +120,14 @@
         let currentSide = 'deuce'; // Track whether it's the Deuce or Odd side
         const history = [];
         let timerInterval;
-        let elapsedTime = 0; // Timer to track seconds
+        let startTime = 0;
 
         function recordServe(outcome) {
+            // Start timer when the first serve is made
+            if (totalServes === 0) {
+                startTimer();
+            }
+
             history.push({ totalServes, ballsIn, ballsWide, ballsWrongSide, ballsLong, ballsNet, currentSide });
 
             totalServes++;
@@ -139,42 +143,12 @@
                 ballsNet++;
             }
 
-            // Start the timer if it's the first serve
-            if (totalServes === 1 && !timerInterval) {
-                startTimer();
-            }
-
             updateStats();
         }
 
         function confirmReset() {
             if (confirm('Are you sure?')) {
-                const resultMessage = `
-                    Total Serves: ${totalServes}
-                    Balls In: ${ballsIn}
-                    Percentage In: ${((ballsIn / totalServes) * 100).toFixed(1)}%
-                    Percentage Out: ${(((ballsWide + ballsWrongSide + ballsLong + ballsNet) / totalServes) * 100).toFixed(1)}%
-                `;
-                
-                // Send the message to a phone number using the backend
-                fetch('/send-sms', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: resultMessage,
-                        toNumber: '+1234567890'  // Replace with the actual phone number
-                    }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('SMS sent:', data);
-                    resetStats();
-                })
-                .catch(error => {
-                    console.error('Error sending SMS:', error);
-                });
+                resetStats();
             }
         }
 
@@ -187,16 +161,8 @@
             ballsLong = 0;
             ballsNet = 0;
             currentSide = 'deuce'; // Reset the side to Deuce
-            elapsedTime = 0; // Reset timer
-            clearInterval(timerInterval); // Stop the timer
-            timerInterval = null; // Reset interval variable
-            
-            // Reset UI Elements
+            stopTimer();
             updateStats();
-            updateTimerDisplay();
-            document.getElementById('current-side').textContent = 'Deuce'; // Reset side label
-            document.getElementById('toggle-side').textContent = 'Switch to Odd Side'; // Reset toggle button text
-            document.getElementById('toggle-side').classList.remove('active'); // Reset toggle button state
         }
 
         function undoLastServe() {
@@ -221,19 +187,6 @@
             toggleButton.classList.toggle('active');
         }
 
-        function startTimer() {
-            timerInterval = setInterval(() => {
-                elapsedTime++;
-                updateTimerDisplay();
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(elapsedTime / 60);
-            const seconds = elapsedTime % 60;
-            document.getElementById('timer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
         function updateStats() {
             document.getElementById('total-serves').textContent = totalServes;
             document.getElementById('balls-in').textContent = ballsIn;
@@ -241,6 +194,22 @@
             const percentageOut = totalServes > 0 ? (((ballsWide + ballsWrongSide + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) : 0;
             document.getElementById('percentage-in').textContent = percentageIn;
             document.getElementById('percentage-out').textContent = percentageOut;
+        }
+
+        // Timer functions
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 100);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            document.getElementById('timer').textContent = "0.0";
+        }
+
+        function updateTimer() {
+            const elapsedTime = (Date.now() - startTime) / 1000;
+            document.getElementById('timer').textContent = elapsedTime.toFixed(1);
         }
     </script>
 </body>
