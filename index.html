@@ -111,10 +111,6 @@
         <span id="timer">0:00</span>
     </div>
 
-    <div class="buttons">
-        <button class="button" onclick="saveSession()">Save Session</button>
-    </div>
-
     <script>
         let totalServes = 0;
         let ballsIn = 0;
@@ -133,8 +129,10 @@
                 startTimer();
             }
 
+            // Update history with the new serve
             history.push({ totalServes, ballsIn, ballsWide, ballsWrongSide, ballsLong, ballsNet, currentSide });
 
+            // Update total serves and balls based on the outcome
             totalServes++;
             if (outcome === 'in') {
                 ballsIn++;
@@ -148,12 +146,13 @@
                 ballsNet++;
             }
 
+            // Update statistics on the page
             updateStats();
         }
 
         function confirmReset() {
-            if (confirm('Are you sure you want to reset the session?')) {
-                resetStats(); // Resets all session data
+            if (confirm('Are you sure?')) {
+                resetStats();
             }
         }
 
@@ -219,8 +218,8 @@
             document.getElementById('timer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Save session to Google Sheets
-        function saveSession() {
+        // Google Sheets - Save Session Data
+        function saveSessionData() {
             const sessionData = {
                 totalServes,
                 ballsIn,
@@ -229,26 +228,11 @@
                 ballsLong,
                 ballsNet,
                 currentSide,
-                duration: document.getElementById('timer').textContent
+                sessionTime: document.getElementById('timer').textContent
             };
 
-            // Send data to Google Sheets
-            fetch('https://script.google.com/macros/s/AKfycbzpHfevQySiM4e2pK5FmJJi-FjYb9EGwspQJofo_gY7GmM3UGFEtANn3EOrUPBC3uAZ/exec', {
-                method: 'POST',
-                headers: {x
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(sessionData),
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert('Session saved!');
-                resetStats(); // Reset after saving
-            })
-            .catch(error => {
-                console.error('Error saving session:', error);
-                alert('Error saving session.');
-            });
+            // Send data to Google Sheet using Apps Script
+            google.script.run.saveServeSessionData(sessionData);
         }
     </script>
 </body>
