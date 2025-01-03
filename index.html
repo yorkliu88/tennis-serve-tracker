@@ -53,6 +53,9 @@
         .button.reset:hover {
             background-color: #5a6268;
         }
+        .reset-container {
+            margin-top: 20px;
+        }
         .toggle-container {
             margin-top: 20px;
         }
@@ -83,8 +86,6 @@
         <p>Percentage Out: <span id="percentage-out">0</span>%</p>
         <p>Current Side: <span id="current-side">Deuce</span></p>
     </div>
-
-    <!-- Serve buttons -->
     <div class="buttons">
         <button class="button in" onclick="recordServe('in')">IN</button>
     </div>
@@ -102,20 +103,15 @@
         <button class="button reset" onclick="confirmReset()">Reset</button>
     </div>
 
-    <!-- Save session button -->
-    <div class="buttons">
-        <button class="button" onclick="saveSessionData()">Save Session</button>
-    </div>
-
-    <!-- Toggle button for switching sides -->
     <div class="toggle-container">
         <button class="toggle-button" id="toggle-side" onclick="toggleSide()">Switch to Odd Side</button>
     </div>
 
-    <!-- Timer display -->
     <div class="timer">
         <span id="timer">0:00</span>
     </div>
+
+    <button class="button" onclick="saveSession()">Save Session</button>
 
     <script>
         let totalServes = 0;
@@ -129,8 +125,9 @@
         let timerInterval;
         let startTime = 0;
 
+        const webAppUrl = 'https://script.google.com/macros/s/AKfycbzpHfevQySiM4e2pK5FmJJi-FjYb9EGwspQJofo_gY7GmM3UGFEtANn3EOrUPBC3uAZ/exec'; // Replace with your Apps Script Web App URL
+
         function recordServe(outcome) {
-            // Start timer when the first serve is made
             if (totalServes === 0) {
                 startTimer();
             }
@@ -153,8 +150,39 @@
             updateStats();
         }
 
+        function saveSession() {
+            if (confirm('Are you sure you want to save this session?')) {
+                const sessionData = {
+                    totalServes,
+                    ballsIn,
+                    ballsWide,
+                    ballsWrongSide,
+                    ballsLong,
+                    ballsNet,
+                    currentSide
+                };
+
+                // Send session data to Google Apps Script via fetch
+                fetch(webAppUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(sessionData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Session saved successfully!');
+                    resetStats();
+                })
+                .catch(error => {
+                    alert('Error saving session: ' + error);
+                });
+            }
+        }
+
         function confirmReset() {
-            if (confirm('Are you sure you want to reset the session?')) {
+            if (confirm('Are you sure?')) {
                 resetStats();
             }
         }
@@ -219,30 +247,6 @@
             const minutes = Math.floor(elapsedTime / 60);
             const seconds = elapsedTime % 60;
             document.getElementById('timer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // Save session data to Google Sheets with confirmation
-        function saveSessionData() {
-            const sessionData = {
-                totalServes,
-                ballsIn,
-                ballsWide,
-                ballsWrongSide,
-                ballsLong,
-                ballsNet,
-                currentSide,
-                sessionTime: document.getElementById('timer').textContent
-            };
-
-            // Show a confirmation dialog
-            if (confirm("Are you sure you want to save this session?")) {
-                // If confirmed, save the session data
-                google.script.run.saveServeSessionData(sessionData);
-                alert("Session data saved successfully!");
-                resetStats();  // Optional: Reset stats after saving
-            } else {
-                alert("Session not saved.");
-            }
         }
     </script>
 </body>
