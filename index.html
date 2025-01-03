@@ -21,7 +21,6 @@
         }
         .buttons {
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
             margin-top: 20px;
@@ -53,8 +52,17 @@
         .button.reset:hover {
             background-color: #5a6268;
         }
-        .reset-container {
-            margin-top: 20px;
+        .button.undo {
+            background-color: #ffc107;
+        }
+        .button.undo:hover {
+            background-color: #e0a800;
+        }
+        .button.save {
+            background-color: #17a2b8;
+        }
+        .button.save:hover {
+            background-color: #138496;
         }
         .timer {
             font-size: 1.5em;
@@ -71,101 +79,136 @@
         <p>Percentage Out: <span id="percentage-out">0</span>%</p>
         <p>Current Side: <span id="current-side">Deuce</span></p>
     </div>
+
+    <!-- First Row: IN button -->
     <div class="buttons">
         <button class="button in" onclick="recordServe('in')">IN</button>
+    </div>
+
+    <!-- Second Row: OUT buttons -->
+    <div class="buttons">
         <button class="button" onclick="recordServe('wide')">Wide</button>
         <button class="button" onclick="recordServe('wrong-side')">Wrong Side</button>
         <button class="button" onclick="recordServe('long')">Long</button>
         <button class="button" onclick="recordServe('net')">Net</button>
     </div>
+
+    <!-- Third Row: Undo, Reset, and Save Session buttons -->
     <div class="buttons">
-        <button class="button" onclick="confirmSave()">Save Session</button>
+        <button class="button undo" onclick="undoLastServe()">Undo</button>
         <button class="button reset" onclick="confirmReset()">Reset</button>
+        <button class="button save" onclick="confirmSave()">Save Session</button>
     </div>
+
     <div class="timer">
         <span id="timer">0:00</span>
     </div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbzgGdpJjvylek_Bmolt7p4dceSLXKIHi4NDvSvOjzKqNGyjhfOVmLaMnmUNZtgS-MjD/exec";
-
         let totalServes = 0;
         let ballsIn = 0;
         let ballsWide = 0;
         let ballsWrongSide = 0;
         let ballsLong = 0;
         let ballsNet = 0;
-        let currentSide = 'deuce';
+        let currentSide = 'Deuce'; // Initial side
+        const history = [];
+        let timerInterval;
+        let startTime;
 
         function recordServe(outcome) {
+            if (totalServes === 0) startTimer();
+            history.push({ totalServes, ballsIn, ballsWide, ballsWrongSide, ballsLong, ballsNet, currentSide });
             totalServes++;
             if (outcome === 'in') ballsIn++;
-            else if (outcome === 'wide') ballsWide++;
-            else if (outcome === 'wrong-side') ballsWrongSide++;
-            else if (outcome === 'long') ballsLong++;
-            else if (outcome === 'net') ballsNet++;
-
+            if (outcome === 'wide') ballsWide++;
+            if (outcome === 'wrong-side') ballsWrongSide++;
+            if (outcome === 'long') ballsLong++;
+            if (outcome === 'net') ballsNet++;
             updateStats();
         }
 
         function updateStats() {
             document.getElementById('total-serves').textContent = totalServes;
             document.getElementById('balls-in').textContent = ballsIn;
-            const percentageIn = totalServes > 0 ? ((ballsIn / totalServes) * 100).toFixed(1) : 0;
-            const percentageOut = totalServes > 0 ? (((ballsWide + ballsWrongSide + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) : 0;
-            document.getElementById('percentage-in').textContent = percentageIn;
-            document.getElementById('percentage-out').textContent = percentageOut;
+            document.getElementById('percentage-in').textContent = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
+            document.getElementById('percentage-out').textContent = (((ballsWide + ballsWrongSide + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            timerInterval = setInterval(() => {
+                const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsedTime / 60);
+                const seconds = elapsedTime % 60;
+                document.getElementById('timer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
         }
 
         function confirmSave() {
-            if (confirm("Are you sure you want to save this session?")) {
-                saveSession();
-            }
+            if (confirm("Are you sure you want to save this session?")) saveSession();
         }
 
-        function saveSession() {
-            const data = {
+        async function saveSession() {
+            const sessionData = {
                 totalServes,
                 ballsIn,
                 ballsWide,
                 ballsWrongSide,
                 ballsLong,
                 ballsNet,
-                currentSide
+                currentSide,
             };
 
-            fetch(scriptUrl, {
-                method: "POST",
-                body: JSON.stringify(data),
-                headers: { "Content-Type": "application/json" }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.result === "success") {
+            try {
+                const response = await fetch("https://script.google.com/macros/s/AKfycbzgGdpJjvylek_Bmolt7p4dceSLXKIHi4NDvSvOjzKqNGyjhfOVmLaMnmUNZtgS-MjD/exec", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(sessionData),
+                });
+
+                const result = await response.json();
+                if (result.result === "success") {
                     alert("Session saved successfully!");
                     resetStats();
                 } else {
-                    alert("Error saving session: " + data.error);
+                    alert("Error saving session: " + result.error);
                 }
-            })
-            .catch(error => alert("Error saving session: " + error.message));
-        }
-
-        function confirmReset() {
-            if (confirm("Are you sure you want to reset the stats?")) {
-                resetStats();
+            } catch (error) {
+                alert("Error saving session: " + error.message);
             }
         }
 
+        function confirmReset() {
+            if (confirm("Are you sure you want to reset?")) resetStats();
+        }
+
         function resetStats() {
+            history.length = 0;
             totalServes = 0;
             ballsIn = 0;
             ballsWide = 0;
             ballsWrongSide = 0;
             ballsLong = 0;
             ballsNet = 0;
-            currentSide = 'deuce';
+            currentSide = 'Deuce';
+            clearInterval(timerInterval);
+            document.getElementById('timer').textContent = "0:00";
             updateStats();
+        }
+
+        function undoLastServe() {
+            if (history.length > 0) {
+                const lastState = history.pop();
+                totalServes = lastState.totalServes;
+                ballsIn = lastState.ballsIn;
+                ballsWide = lastState.ballsWide;
+                ballsWrongSide = lastState.ballsWrongSide;
+                ballsLong = lastState.ballsLong;
+                ballsNet = lastState.ballsNet;
+                currentSide = lastState.currentSide;
+                updateStats();
+            }
         }
     </script>
 </body>
