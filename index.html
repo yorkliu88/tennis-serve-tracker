@@ -145,6 +145,13 @@
             }, 1000);
         }
 
+        function getDuration() {
+            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
         function confirmSave() {
             if (confirm("Are you sure you want to save this session?")) saveSession();
         }
@@ -158,6 +165,7 @@
                 ballsLong,
                 ballsNet,
                 currentSide,
+                duration: getDuration(),
             };
 
             try {
