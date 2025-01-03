@@ -56,21 +56,6 @@
         .reset-container {
             margin-top: 20px;
         }
-        .toggle-container {
-            margin-top: 20px;
-        }
-        .toggle-button {
-            padding: 10px 20px;
-            font-size: 1em;
-            background-color: #ffc107;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .toggle-button.active {
-            background-color: #28a745;
-            color: white;
-        }
         .timer {
             font-size: 1.5em;
             margin-top: 20px;
@@ -88,138 +73,39 @@
     </div>
     <div class="buttons">
         <button class="button in" onclick="recordServe('in')">IN</button>
-    </div>
-
-    <div class="buttons">
         <button class="button" onclick="recordServe('wide')">Wide</button>
         <button class="button" onclick="recordServe('wrong-side')">Wrong Side</button>
         <button class="button" onclick="recordServe('long')">Long</button>
         <button class="button" onclick="recordServe('net')">Net</button>
     </div>
-
-    <!-- 3rd row: Undo and Reset buttons side by side -->
     <div class="buttons">
-        <button class="button" onclick="undoLastServe()">Undo</button>
+        <button class="button" onclick="confirmSave()">Save Session</button>
         <button class="button reset" onclick="confirmReset()">Reset</button>
     </div>
-
-    <div class="toggle-container">
-        <button class="toggle-button" id="toggle-side" onclick="toggleSide()">Switch to Odd Side</button>
-    </div>
-
     <div class="timer">
         <span id="timer">0:00</span>
     </div>
 
-    <button class="button" onclick="saveSession()">Save Session</button>
-
     <script>
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbzgGdpJjvylek_Bmolt7p4dceSLXKIHi4NDvSvOjzKqNGyjhfOVmLaMnmUNZtgS-MjD/exec";
+
         let totalServes = 0;
         let ballsIn = 0;
         let ballsWide = 0;
         let ballsWrongSide = 0;
         let ballsLong = 0;
         let ballsNet = 0;
-        let currentSide = 'deuce'; // Track whether it's the Deuce or Odd side
-        const history = [];
-        let timerInterval;
-        let startTime = 0;
-
-        const webAppUrl = 'https://script.google.com/macros/s/AKfycby5FiT2OYrKdvg9ffTyptIYUqlrrWmd0C_TlPdX3we0bJl_pTPSSlP8dOft96fgXF7z/exec'; // Replace with your Apps Script Web App URL
+        let currentSide = 'deuce';
 
         function recordServe(outcome) {
-            if (totalServes === 0) {
-                startTimer();
-            }
-
-            history.push({ totalServes, ballsIn, ballsWide, ballsWrongSide, ballsLong, ballsNet, currentSide });
-
             totalServes++;
-            if (outcome === 'in') {
-                ballsIn++;
-            } else if (outcome === 'wide') {
-                ballsWide++;
-            } else if (outcome === 'wrong-side') {
-                ballsWrongSide++;
-            } else if (outcome === 'long') {
-                ballsLong++;
-            } else if (outcome === 'net') {
-                ballsNet++;
-            }
+            if (outcome === 'in') ballsIn++;
+            else if (outcome === 'wide') ballsWide++;
+            else if (outcome === 'wrong-side') ballsWrongSide++;
+            else if (outcome === 'long') ballsLong++;
+            else if (outcome === 'net') ballsNet++;
 
             updateStats();
-        }
-
-        function saveSession() {
-            if (confirm('Are you sure you want to save this session?')) {
-                const sessionData = {
-                    totalServes,
-                    ballsIn,
-                    ballsWide,
-                    ballsWrongSide,
-                    ballsLong,
-                    ballsNet,
-                    currentSide
-                };
-
-                // Send session data to Google Apps Script via fetch
-                fetch(webAppUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(sessionData)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert('Session saved successfully!');
-                    resetStats();
-                })
-                .catch(error => {
-                    alert('Error saving session: ' + error);
-                });
-            }
-        }
-
-        function confirmReset() {
-            if (confirm('Are you sure?')) {
-                resetStats();
-            }
-        }
-
-        function resetStats() {
-            history.length = 0; // Clear history
-            totalServes = 0;
-            ballsIn = 0;
-            ballsWide = 0;
-            ballsWrongSide = 0;
-            ballsLong = 0;
-            ballsNet = 0;
-            currentSide = 'deuce'; // Reset the side to Deuce
-            stopTimer();
-            updateStats();
-        }
-
-        function undoLastServe() {
-            if (history.length > 0) {
-                const lastState = history.pop();
-                totalServes = lastState.totalServes;
-                ballsIn = lastState.ballsIn;
-                ballsWide = lastState.ballsWide;
-                ballsWrongSide = lastState.ballsWrongSide;
-                ballsLong = lastState.ballsLong;
-                ballsNet = lastState.ballsNet;
-                currentSide = lastState.currentSide;
-                updateStats();
-            }
-        }
-
-        function toggleSide() {
-            currentSide = (currentSide === 'deuce') ? 'odd' : 'deuce';
-            document.getElementById('current-side').textContent = currentSide.charAt(0).toUpperCase() + currentSide.slice(1);
-            const toggleButton = document.getElementById('toggle-side');
-            toggleButton.textContent = currentSide === 'deuce' ? 'Switch to Odd Side' : 'Switch to Deuce Side';
-            toggleButton.classList.toggle('active');
         }
 
         function updateStats() {
@@ -231,22 +117,55 @@
             document.getElementById('percentage-out').textContent = percentageOut;
         }
 
-        // Timer functions
-        function startTimer() {
-            startTime = Date.now();
-            timerInterval = setInterval(updateTimer, 1000); // Update every second
+        function confirmSave() {
+            if (confirm("Are you sure you want to save this session?")) {
+                saveSession();
+            }
         }
 
-        function stopTimer() {
-            clearInterval(timerInterval);
-            document.getElementById('timer').textContent = "0:00";
+        function saveSession() {
+            const data = {
+                totalServes,
+                ballsIn,
+                ballsWide,
+                ballsWrongSide,
+                ballsLong,
+                ballsNet,
+                currentSide
+            };
+
+            fetch(scriptUrl, {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result === "success") {
+                    alert("Session saved successfully!");
+                    resetStats();
+                } else {
+                    alert("Error saving session: " + data.error);
+                }
+            })
+            .catch(error => alert("Error saving session: " + error.message));
         }
 
-        function updateTimer() {
-            const elapsedTime = Math.floor((Date.now() - startTime) / 1000); // Convert to seconds
-            const minutes = Math.floor(elapsedTime / 60);
-            const seconds = elapsedTime % 60;
-            document.getElementById('timer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        function confirmReset() {
+            if (confirm("Are you sure you want to reset the stats?")) {
+                resetStats();
+            }
+        }
+
+        function resetStats() {
+            totalServes = 0;
+            ballsIn = 0;
+            ballsWide = 0;
+            ballsWrongSide = 0;
+            ballsLong = 0;
+            ballsNet = 0;
+            currentSide = 'deuce';
+            updateStats();
         }
     </script>
 </body>
