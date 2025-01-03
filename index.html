@@ -111,6 +111,10 @@
         <span id="timer">0:00</span>
     </div>
 
+    <div class="buttons">
+        <button class="button" onclick="saveSession()">Save Session</button>
+    </div>
+
     <script>
         let totalServes = 0;
         let ballsIn = 0;
@@ -148,8 +152,8 @@
         }
 
         function confirmReset() {
-            if (confirm('Are you sure?')) {
-                resetStats();
+            if (confirm('Are you sure you want to reset the session?')) {
+                resetStats(); // Resets all session data
             }
         }
 
@@ -213,6 +217,38 @@
             const minutes = Math.floor(elapsedTime / 60);
             const seconds = elapsedTime % 60;
             document.getElementById('timer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Save session to Google Sheets
+        function saveSession() {
+            const sessionData = {
+                totalServes,
+                ballsIn,
+                ballsWide,
+                ballsWrongSide,
+                ballsLong,
+                ballsNet,
+                currentSide,
+                duration: document.getElementById('timer').textContent
+            };
+
+            // Send data to Google Sheets
+            fetch('https://script.google.com/macros/s/your-script-id/exec', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(sessionData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Session saved!');
+                resetStats(); // Reset after saving
+            })
+            .catch(error => {
+                console.error('Error saving session:', error);
+                alert('Error saving session.');
+            });
         }
     </script>
 </body>
