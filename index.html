@@ -99,12 +99,14 @@
         <button class="button" onclick="recordServe('net')">Net</button>
     </div>
 
-    <!-- Third Row: Undo, Reset, Save, and Toggle Side buttons -->
+    <!-- Third Row: Undo, Reset, Save, and Switch Side buttons -->
     <div class="buttons">
         <button class="button undo" onclick="undoLastServe()">Undo</button>
         <button class="button reset" onclick="confirmReset()">Reset</button>
         <button class="button save" onclick="confirmSave()">Save Session</button>
-        <button class="button toggle" onclick="toggleSide()">Toggle Side</button> <!-- Toggle Side button -->
+        <button class="button toggle" onclick="switchSide()">
+            Switch to <span id="toggle-label">Odd</span> <!-- Dynamically updated label -->
+        </button>
     </div>
 
     <div class="timer">
@@ -141,6 +143,7 @@
             document.getElementById('percentage-in').textContent = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
             document.getElementById('percentage-out').textContent = (((ballsWide + ballsWrongSide + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
             document.getElementById('current-side').textContent = currentSide; // Update current side in stats
+            document.getElementById('toggle-label').textContent = currentSide === 'Deuce' ? 'Odd' : 'Deuce'; // Update button label
         }
 
         function startTimer() {
@@ -227,10 +230,13 @@
             }
         }
 
-        function toggleSide() {
-            // Toggle between "Deuce" and "Odd"
-            currentSide = currentSide === 'Deuce' ? 'Odd' : 'Deuce';
-            updateStats(); // Update the stats view
+        function switchSide() {
+            const newSide = currentSide === 'Deuce' ? 'Odd' : 'Deuce';
+            const confirmChange = confirm("Changing side will reset the statistics, are you sure?");
+            if (confirmChange) {
+                currentSide = newSide;
+                resetStats(); // Reset the stats and switch side
+            }
         }
     </script>
 </body>
