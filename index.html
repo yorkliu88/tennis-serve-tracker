@@ -64,6 +64,12 @@
         .button.save:hover {
             background-color: #138496;
         }
+        .button.toggle {
+            background-color: #343a40;
+        }
+        .button.toggle:hover {
+            background-color: #23272b;
+        }
         .timer {
             font-size: 1.5em;
             margin-top: 20px;
@@ -93,11 +99,12 @@
         <button class="button" onclick="recordServe('net')">Net</button>
     </div>
 
-    <!-- Third Row: Undo, Reset, and Save Session buttons -->
+    <!-- Third Row: Undo, Reset, Save, and Toggle Side buttons -->
     <div class="buttons">
         <button class="button undo" onclick="undoLastServe()">Undo</button>
         <button class="button reset" onclick="confirmReset()">Reset</button>
         <button class="button save" onclick="confirmSave()">Save Session</button>
+        <button class="button toggle" onclick="toggleSide()">Toggle Side</button> <!-- Toggle Side button -->
     </div>
 
     <div class="timer">
@@ -133,6 +140,7 @@
             document.getElementById('balls-in').textContent = ballsIn;
             document.getElementById('percentage-in').textContent = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
             document.getElementById('percentage-out').textContent = (((ballsWide + ballsWrongSide + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
+            document.getElementById('current-side').textContent = currentSide; // Update current side in stats
         }
 
         function startTimer() {
@@ -217,6 +225,12 @@
                 currentSide = lastState.currentSide;
                 updateStats();
             }
+        }
+
+        function toggleSide() {
+            // Toggle between "Deuce" and "Odd"
+            currentSide = currentSide === 'Deuce' ? 'Odd' : 'Deuce';
+            updateStats(); // Update the stats view
         }
     </script>
 </body>
