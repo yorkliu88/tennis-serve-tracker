@@ -105,7 +105,7 @@
         <button class="button reset" onclick="confirmReset()">Reset</button>
         <button class="button save" onclick="confirmSave()">Save Session</button>
         <button class="button toggle" onclick="switchSide()">
-            Switch to <span id="toggle-label">Odd</span> <!-- Dynamically updated label -->
+            Switch to <span id="toggle-label">Ad</span> <!-- Dynamically updated label -->
         </button>
     </div>
 
@@ -145,7 +145,7 @@
             document.getElementById('percentage-in').textContent = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
             document.getElementById('percentage-out').textContent = (((ballsWide + ballsWrongSide + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
             document.getElementById('current-side').textContent = currentSide; // Update current side in stats
-            document.getElementById('toggle-label').textContent = currentSide === 'Deuce' ? 'Odd' : 'Deuce'; // Update button label
+            document.getElementById('toggle-label').textContent = currentSide === 'Deuce' ? 'Ad' : 'Deuce'; // Update button label
         }
 
         function startTimer() {
@@ -229,7 +229,7 @@
         function switchSide() {
             if (confirm("Changing sides will reset the statistics. Are you sure?")) {
                 resetStats();
-                currentSide = currentSide === 'Deuce' ? 'Odd' : 'Deuce';
+                currentSide = currentSide === 'Deuce' ? 'Ad' : 'Deuce';
                 updateStats();
             }
         }
