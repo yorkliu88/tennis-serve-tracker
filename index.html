@@ -165,16 +165,19 @@
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
+        // Function to confirm if the user wants to save the session
         function confirmSave() {
-            if (confirm("Are you sure you want to save this session?")) saveSession();
+            if (confirm("Saving Session will reset the statistics. Are you sure?")) {
+                saveSession();
+            }
         }
 
+        // Function to save the session
         async function saveSession() {
-
             // Calculate percentages
             const percentageIn = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
             const percentageOut = (((ballsWide + ballsWrongBox + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
-            
+
             const sessionData = {
                 totalServes,
                 ballsIn,
@@ -183,8 +186,8 @@
                 ballsLong,
                 ballsNet,
                 currentSide,
-                percentageIn,
-                percentageOut,
+                percentageIn,       // Add percentageIn here
+                percentageOut,      // Add percentageOut here
                 duration: getDuration(),
             };
 
@@ -196,6 +199,7 @@
                     body: JSON.stringify(sessionData),
                 });
                 alert("Session saved successfully!");
+                resetStats(); // Reset statistics after saving
             } catch (error) {
                 alert("Failed to save session.");
             }
