@@ -75,20 +75,26 @@
             margin-top: 20px;
         }
 
-        /* Animation for the nudge effect */
+        /* Enhanced Animation for the nudge effect */
         .nudge-animation {
-            animation: nudge 0.3s ease;
+            animation: nudge 0.5s ease-out;
         }
 
         @keyframes nudge {
             0% {
                 transform: scale(1);
+                color: #000;
+                font-weight: normal;
             }
             50% {
-                transform: scale(1.2);
+                transform: scale(1.4);
+                color: #ff6347; /* Tomato color to make it more obvious */
+                font-weight: bold;
             }
             100% {
                 transform: scale(1);
+                color: #000;
+                font-weight: normal;
             }
         }
     </style>
@@ -166,18 +172,18 @@
             document.getElementById('current-side').textContent = currentSide; // Update current side in stats
             document.getElementById('toggle-label').textContent = currentSide === 'Deuce' ? 'Ad' : 'Deuce'; // Update button label
             
-            // Apply nudge animation to percentage-in and percentage-out elements
+            // Apply enhanced nudge animation to percentage-in and percentage-out elements
             const percentageInElement = document.getElementById('percentage-in');
             const percentageOutElement = document.getElementById('percentage-out');
 
             percentageInElement.classList.add('nudge-animation');
             percentageOutElement.classList.add('nudge-animation');
 
-            // Remove the nudge animation after 300ms to reset the effect
+            // Remove the nudge animation after 500ms to reset the effect
             setTimeout(() => {
                 percentageInElement.classList.remove('nudge-animation');
                 percentageOutElement.classList.remove('nudge-animation');
-            }, 300);
+            }, 500);
         }
 
         function startTimer() {
