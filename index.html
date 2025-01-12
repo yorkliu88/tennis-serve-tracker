@@ -74,6 +74,23 @@
             font-size: 1.5em;
             margin-top: 20px;
         }
+
+        /* Add CSS for the animation on percentage change */
+        .nudge-animation {
+            animation: nudge 0.3s ease-out;
+        }
+
+        @keyframes nudge {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -140,10 +157,31 @@
         }
 
         function updateStats() {
+            // Update total serves
             document.getElementById('total-serves').textContent = totalServes;
             document.getElementById('balls-in').textContent = ballsIn;
-            document.getElementById('percentage-in').textContent = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
-            document.getElementById('percentage-out').textContent = (((ballsWide + ballsWrongBox + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
+
+            // Calculate and update percentage values
+            const percentageIn = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
+            const percentageOut = (((ballsWide + ballsWrongBox + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
+
+            // Apply the nudge animation to the percentage elements
+            const percentageInElement = document.getElementById('percentage-in');
+            const percentageOutElement = document.getElementById('percentage-out');
+
+            percentageInElement.textContent = percentageIn;
+            percentageOutElement.textContent = percentageOut;
+
+            // Add animation class to the elements
+            percentageInElement.classList.add('nudge-animation');
+            percentageOutElement.classList.add('nudge-animation');
+
+            // Remove animation class after animation ends
+            setTimeout(() => {
+                percentageInElement.classList.remove('nudge-animation');
+                percentageOutElement.classList.remove('nudge-animation');
+            }, 300);
+
             document.getElementById('current-side').textContent = currentSide; // Update current side in stats
             document.getElementById('toggle-label').textContent = currentSide === 'Deuce' ? 'Ad' : 'Deuce'; // Update button label
         }
@@ -165,14 +203,12 @@
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Function to confirm if the user wants to save the session
         function confirmSave() {
             if (confirm("Saving Session will reset the statistics. Are you sure?")) {
                 saveSession();
             }
         }
 
-        // Function to save the session
         async function saveSession() {
             // Calculate percentages
             const percentageIn = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
