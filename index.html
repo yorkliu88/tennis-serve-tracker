@@ -94,7 +94,7 @@
     <!-- Second Row: OUT buttons -->
     <div class="buttons">
         <button class="button" onclick="recordServe('wide')">Wide</button>
-        <button class="button" onclick="recordServe('wrong-side')">Wrong Side</button>
+        <button class="button" onclick="recordServe('wrong-box')">Wrong Box</button>
         <button class="button" onclick="recordServe('long')">Long</button>
         <button class="button" onclick="recordServe('net')">Net</button>
     </div>
@@ -117,7 +117,7 @@
         let totalServes = 0;
         let ballsIn = 0;
         let ballsWide = 0;
-        let ballsWrongSide = 0;
+        let ballsWrongBox = 0;
         let ballsLong = 0;
         let ballsNet = 0;
         let currentSide = 'Deuce'; // Initial side
@@ -129,11 +129,11 @@
             if (totalServes === 0 && !timerInterval) {
                 startTimer();
             }
-            history.push({ totalServes, ballsIn, ballsWide, ballsWrongSide, ballsLong, ballsNet, currentSide });
+            history.push({ totalServes, ballsIn, ballsWide, ballsWrongBox, ballsLong, ballsNet, currentSide });
             totalServes++;
             if (outcome === 'in') ballsIn++;
             if (outcome === 'wide') ballsWide++;
-            if (outcome === 'wrong-side') ballsWrongSide++;
+            if (outcome === 'wrong-box') ballsWrongBox++;
             if (outcome === 'long') ballsLong++;
             if (outcome === 'net') ballsNet++;
             updateStats();
@@ -143,7 +143,7 @@
             document.getElementById('total-serves').textContent = totalServes;
             document.getElementById('balls-in').textContent = ballsIn;
             document.getElementById('percentage-in').textContent = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
-            document.getElementById('percentage-out').textContent = (((ballsWide + ballsWrongSide + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
+            document.getElementById('percentage-out').textContent = (((ballsWide + ballsWrongBox + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
             document.getElementById('current-side').textContent = currentSide; // Update current side in stats
             document.getElementById('toggle-label').textContent = currentSide === 'Deuce' ? 'Ad' : 'Deuce'; // Update button label
         }
@@ -174,7 +174,7 @@
                 totalServes,
                 ballsIn,
                 ballsWide,
-                ballsWrongSide,
+                ballsWrongBox,
                 ballsLong,
                 ballsNet,
                 currentSide,
@@ -199,7 +199,7 @@
             totalServes = 0;
             ballsIn = 0;
             ballsWide = 0;
-            ballsWrongSide = 0;
+            ballsWrongBox = 0;
             ballsLong = 0;
             ballsNet = 0;
             currentSide = 'Deuce';
@@ -219,7 +219,7 @@
                 totalServes = lastState.totalServes;
                 ballsIn = lastState.ballsIn;
                 ballsWide = lastState.ballsWide;
-                ballsWrongSide = lastState.ballsWrongSide;
+                ballsWrongBox = lastState.ballsWrongBox;
                 ballsLong = lastState.ballsLong;
                 ballsNet = lastState.ballsNet;
                 currentSide = lastState.currentSide;
