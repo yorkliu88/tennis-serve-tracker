@@ -75,9 +75,9 @@
             margin-top: 20px;
         }
 
-        /* Add CSS for the animation on percentage change */
+        /* Animation for the nudge effect */
         .nudge-animation {
-            animation: nudge 0.3s ease-out;
+            animation: nudge 0.3s ease;
         }
 
         @keyframes nudge {
@@ -157,33 +157,27 @@
         }
 
         function updateStats() {
-            // Update total serves
             document.getElementById('total-serves').textContent = totalServes;
             document.getElementById('balls-in').textContent = ballsIn;
-
-            // Calculate and update percentage values
             const percentageIn = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
+            document.getElementById('percentage-in').textContent = percentageIn;
             const percentageOut = (((ballsWide + ballsWrongBox + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
-
-            // Apply the nudge animation to the percentage elements
+            document.getElementById('percentage-out').textContent = percentageOut;
+            document.getElementById('current-side').textContent = currentSide; // Update current side in stats
+            document.getElementById('toggle-label').textContent = currentSide === 'Deuce' ? 'Ad' : 'Deuce'; // Update button label
+            
+            // Apply nudge animation to percentage-in and percentage-out elements
             const percentageInElement = document.getElementById('percentage-in');
             const percentageOutElement = document.getElementById('percentage-out');
 
-            percentageInElement.textContent = percentageIn;
-            percentageOutElement.textContent = percentageOut;
-
-            // Add animation class to the elements
             percentageInElement.classList.add('nudge-animation');
             percentageOutElement.classList.add('nudge-animation');
 
-            // Remove animation class after animation ends
+            // Remove the nudge animation after 300ms to reset the effect
             setTimeout(() => {
                 percentageInElement.classList.remove('nudge-animation');
                 percentageOutElement.classList.remove('nudge-animation');
             }, 300);
-
-            document.getElementById('current-side').textContent = currentSide; // Update current side in stats
-            document.getElementById('toggle-label').textContent = currentSide === 'Deuce' ? 'Ad' : 'Deuce'; // Update button label
         }
 
         function startTimer() {
@@ -204,16 +198,10 @@
         }
 
         function confirmSave() {
-            if (confirm("Saving Session will reset the statistics. Are you sure?")) {
-                saveSession();
-            }
+            if (confirm("Saving Session will reset the statistic. Are you sure?")) saveSession();
         }
 
         async function saveSession() {
-            // Calculate percentages
-            const percentageIn = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
-            const percentageOut = (((ballsWide + ballsWrongBox + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
-
             const sessionData = {
                 totalServes,
                 ballsIn,
@@ -222,8 +210,8 @@
                 ballsLong,
                 ballsNet,
                 currentSide,
-                percentageIn,       // Add percentageIn here
-                percentageOut,      // Add percentageOut here
+                percentageIn: ((ballsIn / totalServes) * 100).toFixed(1) || 0,
+                percentageOut: (((ballsWide + ballsWrongBox + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0,
                 duration: getDuration(),
             };
 
@@ -235,7 +223,7 @@
                     body: JSON.stringify(sessionData),
                 });
                 alert("Session saved successfully!");
-                resetStats(); // Reset statistics after saving
+                resetStats(); // Reset stats after saving
             } catch (error) {
                 alert("Failed to save session.");
             }
