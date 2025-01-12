@@ -170,6 +170,11 @@
         }
 
         async function saveSession() {
+
+            // Calculate percentages
+            const percentageIn = ((ballsIn / totalServes) * 100).toFixed(1) || 0;
+            const percentageOut = (((ballsWide + ballsWrongBox + ballsLong + ballsNet) / totalServes) * 100).toFixed(1) || 0;
+            
             const sessionData = {
                 totalServes,
                 ballsIn,
